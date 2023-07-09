@@ -1,5 +1,5 @@
 // *
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Section from './Section/Section';
 import ContactForm from './Contact-form/Contact-form';
 import Filter from './FIlter/Filter';
@@ -8,67 +8,64 @@ import Notification from './Notification/Notification';
 // ? // Ключ сховища ;
 const STORAGE_KEY = 'contacts';
 // ? // Масив контактів який перевіряє наявність та отримує контакти із local storage ;
-let loadedContactsArray = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-// ? // Кмпонент App ;
-export class App extends React.Component {
-  state = {
-    contacts: loadedContactsArray,
-    filter: '',
-  };
-  componentDidUpdate() {
-    if (this.state.contacts !== loadedContactsArray) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state.contacts));
+let loadedContactsArray = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+console.log(
+  '🚀 ~ file: App.jsx:12 ~ loadedContactsArray:',
+  loadedContactsArray
+);
+// ? // Кoмпонент App ;
+const App = () => {
+  const [contacts, setContacts] = useState(loadedContactsArray);
+  let [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    if (contacts !== loadedContactsArray) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
     }
-    if (this.state.contacts.length === 0) {
+    if (contacts.length === 0) {
       localStorage.removeItem(STORAGE_KEY);
     }
-  }
-  onContactAdding = contactData => {
-    if (
-      this.state.contacts.find(contact => contact.name === contactData.name)
-    ) {
+    console.log(contacts);
+  });
+  const onContactAdding = contactData => {
+    console.log(contactData);
+    if (contacts.find(contact => contact.name === contactData.name)) {
       alert(`${contactData.name} is already in contacts`);
       return;
     }
-    this.setState({ contacts: [...this.state.contacts, contactData] });
+    setContacts([...contacts, contactData]);
   };
-  onContactRemoving = id => {
-    this.setState({
-      contacts: this.state.contacts.filter(contact => contact.id !== id),
-    });
+  const onContactRemoving = id => {
+    setContacts(contacts.filter(contact => contact.id !== id));
   };
-  onFilterChange = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const onFilterChange = e => {
+    setFilter(e.currentTarget.value);
   };
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state;
+  const getFilteredContacts = () => {
+    console.log(contacts);
     const normalizedFilter = filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
-  render() {
-    const filteredContacts = this.getFilteredContacts();
-    return (
-      <div className="App">
-        <Section title="Phonebook">
-          <ContactForm onContactAdding={this.onContactAdding}></ContactForm>
-        </Section>
-        <Section title="Contacts">
-          <Filter
-            value={this.state.filter}
-            onFilterChange={this.onFilterChange}
-          ></Filter>
-          {this.state.contacts.length > 0 ? (
-            <ContactsList
-              contactsData={filteredContacts}
-              onContactRemoving={this.onContactRemoving}
-            ></ContactsList>
-          ) : (
-            <Notification message="There is no contacts"></Notification>
-          )}
-        </Section>
-      </div>
-    );
-  }
-}
+  const filteredContacts = getFilteredContacts();
+  return (
+    <div className="App">
+      <Section title="Phonebook">
+        <ContactForm onContactAdding={onContactAdding}></ContactForm>
+      </Section>
+      <Section title="Contacts">
+        <Filter value={filter} onFilterChange={onFilterChange}></Filter>
+        {contacts.length > 0 ? (
+          <ContactsList
+            contactsData={filteredContacts}
+            onContactRemoving={onContactRemoving}
+          ></ContactsList>
+        ) : (
+          <Notification message="There is no contacts"></Notification>
+        )}
+      </Section>
+    </div>
+  );
+};
+export default App;
