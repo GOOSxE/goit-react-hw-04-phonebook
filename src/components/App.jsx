@@ -9,10 +9,6 @@ import Notification from './Notification/Notification';
 const STORAGE_KEY = 'contacts';
 // ? // Масив контактів який перевіряє наявність та отримує контакти із local storage ;
 let loadedContactsArray = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-console.log(
-  '🚀 ~ file: App.jsx:12 ~ loadedContactsArray:',
-  loadedContactsArray
-);
 // ? // Кoмпонент App ;
 const App = () => {
   const [contacts, setContacts] = useState(loadedContactsArray);
@@ -28,7 +24,6 @@ const App = () => {
     console.log(contacts);
   });
   const onContactAdding = contactData => {
-    console.log(contactData);
     if (contacts.find(contact => contact.name === contactData.name)) {
       alert(`${contactData.name} is already in contacts`);
       return;
@@ -42,7 +37,6 @@ const App = () => {
     setFilter(e.currentTarget.value);
   };
   const getFilteredContacts = () => {
-    console.log(contacts);
     const normalizedFilter = filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
