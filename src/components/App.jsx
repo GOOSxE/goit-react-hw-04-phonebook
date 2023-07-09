@@ -21,7 +21,6 @@ const App = () => {
     if (contacts.length === 0) {
       localStorage.removeItem(STORAGE_KEY);
     }
-    console.log(contacts);
   });
   const onContactAdding = contactData => {
     if (contacts.find(contact => contact.name === contactData.name)) {
